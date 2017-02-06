@@ -1,0 +1,10 @@
+SyntaxError: Unexpected token , in JSON at position 93
+    at Object.parse (native)
+    at /home/tyt03538/FanTravelBackEnd/node_modules/body-parser/index.js:52:25
+    at IncomingMessage.onEnd (/home/tyt03538/FanTravelBackEnd/node_modules/raw-body/index.js:119:7)
+    at IncomingMessage.g (events.js:291:16)
+    at emitNone (events.js:86:13)
+    at IncomingMessage.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:974:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
