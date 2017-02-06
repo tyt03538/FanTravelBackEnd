@@ -551,6 +551,7 @@ router.route('/trip/updatePeriod/:tripID')
                     if( trip.travellers[i].email === req.body.email ) {
                         // Push the request body dates into the travller record
                         travellerUpdated = true;
+						trip.travellers[i].availableDates = [];
                         for (var j = 0; j < req.body.availableDates.length; j++) {
                             trip.travellers[i].availableDates.push(req.body.availableDates[j]);
                         }
