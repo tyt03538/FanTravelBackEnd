@@ -1,34 +1,33 @@
 var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
-var packageSchema   = new Schema({
-    packageID: String,
-    destination: String,
-    ImageURL: String,
-    price: {
-		total: Float,
-		flight: Float,
-		hotel: FLoat
-	}
-    flights:[
-		{
-			flightNumber: String,
-			departureDate: String,
-			arrivalDate: String
-		}
+var flightSchema = new Schema({
+	flightNumber: String,
+	departureDate: Date,
+	arrivalDate: Date,
+	price: Number,
+	departurePort: String,
+	arrivalPort: String
+});
+
+var hotelSchema = new Schema({
+	name: String,
+	checkinDate: Date,
+	checkoutDate: Date,
+	price: Number,
+	address: String
+})
+
+var packageSchema = new Schema({
+	pid: String,
+	dest: String,
+	price: Number,
+	flights: [
+		flightSchema
+	],
+	hotels: [
+		hotelSchema
 	]
-    hotels:[
-		{
-			hotelName: String,
-			checkinDate: String,
-			checkoutDate: String,
-		}
-	}
-    availableDate: [ {startDate : String, endDate : String} ],
-    targetDestination: String,
-    schColStatus:  [ {uid : String, provided : Boolean} ],
-    packageAssigned: String,
-    packageChosen: String
 });
 
 module.exports = mongoose.model('package', packageSchema);

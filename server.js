@@ -13,6 +13,7 @@ mongoose.connect('mongodb://localhost:27017/FanTravel'); // connect to our datab
 
 var User = require('./app/models/user')
 var Trip = require('./app/models/trip')
+var Package = require('./app/models/package')
 // configure app to use bodyParser()
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
