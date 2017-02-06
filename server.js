@@ -27,7 +27,7 @@ var router = express.Router();              // get an instance of the express Ro
 // middleware to use for all requests
 router.use(function(req, res, next) {
     // do logging
-    console.log(req.ip + ' is calling to the server.');
+    console.log(Date() + req.ip + ' is calling to the server.');
     next(); // make sure we go to the next routes and don't stop here
 });
 
