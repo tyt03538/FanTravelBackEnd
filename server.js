@@ -702,9 +702,19 @@ router.route('/trip/updatePeriod/:tripID')
         })
     })
 	
-router.route('/trip/updatePeriod/:tripID')
-	.get(function(req, res){
-		res.status(200).({"message":"go back home to sleep before doing further development la"})
+router.route('/trip/package/:packageID')
+	.post(function(req, res){
+		var package = new Package();      // create a new instance of the Package model
+
+        package = req.body;
+
+        package.save(function(err){
+            if(err) {
+                res.status(500).send(err);
+            }
+
+            res.status(200).json({"packageID":package.id});
+        })
 	})
 
 // more routes for our API will happen here
