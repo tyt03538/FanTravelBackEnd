@@ -684,6 +684,8 @@ router.route('/trip/updatePeriod/:tripID')
                     }
 
                     trip.period = tmpPeriod;
+
+                    trip.status = "pendingPackages";
                 }
 
                 // Save the trip with updated periods
