@@ -701,6 +701,11 @@ router.route('/trip/updatePeriod/:tripID')
             }
         })
     })
+	
+router.route('/trip/updatePeriod/:tripID')
+	.get(function(req, res){
+		res.status(200).({"message":"go back home to sleep before doing further development la"})
+	})
 
 // more routes for our API will happen here
 
