@@ -19,8 +19,8 @@ var hotelSchema = new Schema({
 })
 
 var packageSchema = new Schema({
-	pid: String,
-	dest: String,
+	packageID: String,
+	destination: String,
 	price: Number,
 	flights: [
 		flightSchema
