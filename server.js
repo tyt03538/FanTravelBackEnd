@@ -739,7 +739,7 @@ router.route('/package')
 
 router.route('/package/:packageID')
     .get(function(req, res){
-        conditions={"id": req.params.packageID};
+        conditions={"_id": req.params.packageID};
 
         Package.findOne(conditions, function(err, pkg){
             if (err) {
