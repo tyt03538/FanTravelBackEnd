@@ -766,6 +766,7 @@ setInterval(function () {
 
         for (var i = 0; i < trip.length; i++) {
             if (trip[i].status == "pendingPackages") {
+                console.log(trip[i].id+" is ready to be assigned with packages");
                 Package.find(function(err, pkg){
                     var tmpAssignedPackage = [];
                     for (var i = 0; i < pkg.length; i++) {
