@@ -737,6 +737,24 @@ router.route('/package')
         })
     })
 
+router.route('/package/:packageID')
+    .get(function(req, res){
+        conditions={"id": req.params.packageID};
+
+        Package.findOne(conditions, function(err, pkg){
+            if (err) {
+                res.status(500).send(err);
+            }
+
+            if(pkg) {
+                pkg.packageID = pkg.id;
+                res.status(200).json(pkg.toJSON());
+            } else {
+                res.status(404).json({"message":"package not found"});
+            }
+        })
+    })
+
 // more routes for our API will happen here
 
 // REGISTER OUR ROUTES -------------------------------
