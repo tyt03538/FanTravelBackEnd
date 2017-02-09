@@ -704,7 +704,7 @@ router.route('/trip/updatePeriod/:tripID')
         })
     })
 	
-router.route('/trip/package/:packageID')
+router.route('/trip/package/')
 	.post(function(req, res){
 		var package = new Package();      // create a new instance of the Package model
 
