@@ -777,9 +777,14 @@ setInterval(function () {
                     console.log("hello: "+trip.id);
                     trip.packageAssigned = tmpAssignedPackage;
                     trip.status = "pendingPackageRanks";
+
+                    trip.save(function(err){
+                        if (err) {
+                            console.log(err);
+                        }
+                    })
                 })
             }
-
             callback();
         }, function(err){
             if (err) {
