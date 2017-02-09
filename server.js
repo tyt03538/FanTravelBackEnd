@@ -708,7 +708,11 @@ router.route('/package')
 	.post(function(req, res){
 		var pkg = new Package();      // create a new instance of the Package model
 
-        pkg = req.body;
+        pkg.packageID = "";
+        pkg.destination = req.body.destination;
+        pkg.price = req.body.price;
+        pkg.flights = req.body.flights;
+        pkg.hotels = req.body.hotels;
 
         pkg.save(function(err){
             if(err) {
