@@ -8,6 +8,7 @@ var express    = require('express');        // call express
 var app        = express();                 // define our app using express
 var bodyParser = require('body-parser');
 var mongoose   = require('mongoose');
+var async      = require('async');
 
 mongoose.connect('mongodb://localhost:27017/FanTravel'); // connect to our database
 
@@ -759,25 +760,33 @@ router.route('/package/:packageID')
 setInterval(function () { 
     console.log('checking status for all the trips');
 
-    Trip.find(function(err, trip){
+    Trip.find(function(err, trips){
         if (err) {
             console.log(err);
         }
 
-        for (var i = 0; i < trip.length; i++) {
-            if (trip[i].status == "pendingPackages") {
-                console.log(trip[i].id+" is ready to be assigned with packages");
+        async.eachSeries(trips, function(trip, callback){
+            if (trip.status == "pendingPackages") {
+                console.log(trip.id+" is ready to be assigned with packages");
                 Package.find(function(err, pkg){
                     var tmpAssignedPackage = [];
                     for (var i = 0; i < pkg.length; i++) {
                         tmpAssignedPackage.push(pkg[i].id);
                     };
 
-                    trip[i].packageAssigned = tmpAssignedPackage;
-                    trip[i].status = "pendingPackageRanks";
+                    trip.packageAssigned = tmpAssignedPackage;
+                    trip.status = "pendingPackageRanks";
                 })
             }
-        };
+
+            callback();
+        }, function(err){
+            if (err) {
+                throw err;
+            }
+
+            console.log('all trips checked');
+        })
     })
 }, 3000); 
 
