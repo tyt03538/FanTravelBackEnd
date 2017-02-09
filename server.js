@@ -723,6 +723,20 @@ router.route('/package')
         })
 	})
 
+    .get(function(req, res){
+        Package.find(function(err, pkg){
+            if (err) {
+                res.status(500).send(err);
+            }
+
+            for (var i = 0; i < pkg.length; i++) {
+                pkg[i].packageID = pkg[i].id;
+            };
+
+            res.status(200).json(pkg);
+        })
+    })
+
 // more routes for our API will happen here
 
 // REGISTER OUR ROUTES -------------------------------

@@ -30,4 +30,11 @@ var packageSchema = new Schema({
 	]
 });
 
+packageSchema.options.toJSON = {
+  transform: function(doc, ret) {
+    delete ret._id;
+    delete ret.__v;
+  }
+};
+
 module.exports = mongoose.model('package', packageSchema);
