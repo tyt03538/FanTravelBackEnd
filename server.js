@@ -755,6 +755,31 @@ router.route('/package/:packageID')
         })
     })
 
+// the following is the periodic function to check if there are any trips that have all schedules collected from the travllers
+setInterval(function () { 
+    console.log('checking status for all the trips');
+
+    Trip.find(function(err, trip){
+        if (err) {
+            console.log(err);
+        }
+
+        for (var i = 0; i < trip.length; i++) {
+            if (trip[i].status == "pendingPackages") {
+                Package.find(function(err, pkg){
+                    var tmpAssignedPackage = [];
+                    for (var i = 0; i < pkg.length; i++) {
+                        tmpAssignedPackage.push(pkg[i].id);
+                    };
+
+                    trip[i].packageAssigned = tmpAssignedPackage;
+                    trip[i].status = "pendingPackageRanks";
+                })
+            }
+        };
+    })
+}, 3000); 
+
 // more routes for our API will happen here
 
 // REGISTER OUR ROUTES -------------------------------
