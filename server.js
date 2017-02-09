@@ -774,6 +774,7 @@ setInterval(function () {
                         tmpAssignedPackage.push(pkg[i].id);
                     };
 
+                    console.log("hello: "+trip.id);
                     trip.packageAssigned = tmpAssignedPackage;
                     trip.status = "pendingPackageRanks";
                 })
