@@ -706,16 +706,16 @@ router.route('/trip/updatePeriod/:tripID')
 	
 router.route('/package')
 	.post(function(req, res){
-		var package = new Package();      // create a new instance of the Package model
+		var pkg = new Package();      // create a new instance of the Package model
 
-        package = req.body;
+        pkg = req.body;
 
-        package.save(function(err){
+        pkg.save(function(err){
             if(err) {
                 res.status(500).send(err);
             }
 
-            res.status(200).json({"packageID":package.id});
+            res.status(200).json({"packageID":pkg.id});
         })
 	})
 
