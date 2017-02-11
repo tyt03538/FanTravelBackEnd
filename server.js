@@ -520,15 +520,15 @@ router.route('/trip/updatePackageRank/:tripID')
                 } else {
                     if(allHaveRank) {
                         var rankingScore = [];
-                        for (var i = 0; i < packageAssigned.length; i++) {
+                        for (var i = 0; i < trip.packageAssigned.length; i++) {
                             rankingScore[i] = 0;
                         };
 
                         for (var i = 0; i < trip.travellers.length; i++) {
                            for (var j = 0; j < trip.travellers.packageRank.length; j++) {
-                                for (var k = 0; k < packageAssigned.length; k++) {
-                                    if(trip.travellers[i].packageRank[j] == packageAssigned[k]) {
-                                        rankingScore[k] += packageAssigned.length - j;
+                                for (var k = 0; k < trip.packageAssigned.length; k++) {
+                                    if(trip.travellers[i].packageRank[j] == trip.packageAssigned[k]) {
+                                        rankingScore[k] += trip.packageAssigned.length - j;
                                     };
                                 };
                             };
@@ -539,7 +539,7 @@ router.route('/trip/updatePackageRank/:tripID')
                         for (var i = 0; i < rankingScore.length; i++) {
                             if(rankingScore[i] > max) {
                                 max = rankingScore[i];
-                                trip.packageChosen = packageAssigned[i];
+                                trip.packageChosen = trip.packageAssigned[i];
                             };
 
                         };
