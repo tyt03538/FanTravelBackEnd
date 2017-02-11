@@ -673,34 +673,19 @@ router.route('/trip/updatePeriod/:tripID')
                         // s-------------e
                         //     s------e
                         if(tmpPeriod[i].endDate >= tmpPeriod[i+1].endDate) {
-                            if(tmpPeriod[i].email == tmpPeriod[i+1].email) {
-                                tmpPeriod[i+1].startDate = tmpPeriod[i].startDate;
-                                tmpPeriod[i+1].endDate = tmpPeriod[i].endDate;
-                                indexToRemove.push(i);
-                            } else {
-                                indexToRemove.push(i);
-                            }
+                            indexToRemove.push(i);
                         } else {
                             // The period overlaps with next period, i.e.
                             // s-------------e
                             //            s--------e
                             if(tmpPeriod[i].endDate >= tmpPeriod[i+1].startDate) {
-                                if(tmpPeriod[i].email == tmpPeriod[i+1].email) {
-                                    tmpPeriod[i+1].startDate = tmpPeriod[i].startDate;
-                                    indexToRemove.push(i);
-                                } else {
-                                    tmpPeriod[i+1].endDate = tmpPeriod[i].endDate;
-                                    indexToRemove.push(i);
-                                }
+                                tmpPeriod[i+1].endDate = tmpPeriod[i].endDate;
+                                indexToRemove.push(i);
                             } else {
                                 // The period does not overlap with next period, i.e.
                                 // s-------------e
                                 //                   s--------e
-                                if(tmpPeriod[i].email == tmpPeriod[i+1].email) {
-                                    // Do nothing
-                                } else {
-                                    indexToRemove.push(i);
-                                }
+                                indexToRemove.push(i);
                             }
                         }
                     };
