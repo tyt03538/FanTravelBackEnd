@@ -501,11 +501,16 @@ router.route('/trip/updatePackageRank/:tripID')
             }
 
             var updated = false;
+            var allHaveRank = true;
             if(trip) {
                 for (var i = 0; i < trip.travellers.length; i++) {
                     if(trip.travellers[i].email == req.body.email) {
                         trip.travellers[i].packageRank = req.body.packageRank;
                         updated = true;
+                    }
+
+                    if(trip.travellers[i].packageRank.length == 0) {
+                        allHaveRank = false;
                     }
                 };
 
@@ -513,6 +518,34 @@ router.route('/trip/updatePackageRank/:tripID')
                     res.status(400).json({"message":"travller specified not found in the trip"});
                     return;
                 } else {
+                    if(allHaveRank) {
+                        var rankingScore = [];
+                        for (var i = 0; i < packageAssigned.length; i++) {
+                            rankingScore[i] = 0;
+                        };
+
+                        for (var i = 0; i < trip.travellers.length; i++) {
+                           for (var j = 0; j < trip.travellers.packageRank.length; j++) {
+                                for (var k = 0; k < packageAssigned.length; k++) {
+                                    if(trip.travellers[i].packageRank[j] == packageAssigned[k]) {
+                                        rankingScore[k] += packageAssigned.length - j;
+                                    };
+                                };
+                            };
+                        };
+
+                        var max = 0;
+
+                        for (var i = 0; i < rankingScore.length; i++) {
+                            if(rankingScore[i] > max) {
+                                max = rankingScore[i];
+                                trip.packageChosen = packageAssigned[i];
+                            };
+
+                        };
+                        trip.status = "confirming";        
+                    }
+
                     trip.save(function(err) {
                         if(err) {
                             res.status(500).send(err);
@@ -774,9 +807,8 @@ setInterval(function () {
                         tmpAssignedPackage.push(pkg[i].id);
                     };
 
-                    console.log("hello: "+trip.id);
                     trip.packageAssigned = tmpAssignedPackage;
-                    trip.status = "pendingPackageRanks";
+                    trip.status = "ranking";
 
                     trip.save(function(err){
                         if (err) {
