@@ -525,7 +525,7 @@ router.route('/trip/updatePackageRank/:tripID')
                         };
 
                         for (var i = 0; i < trip.travellers.length; i++) {
-                           for (var j = 0; j < trip.travellers.packageRank.length; j++) {
+                           for (var j = 0; j < trip.travellers[i].packageRank.length; j++) {
                                 for (var k = 0; k < trip.packageAssigned.length; k++) {
                                     if(trip.travellers[i].packageRank[j] == trip.packageAssigned[k]) {
                                         rankingScore[k] += trip.packageAssigned.length - j;
