@@ -600,11 +600,11 @@ router.route('/trip/updatePackageConfirmation/:tripID')
                                     if(trip.travellers[i].packageConfirmation === "declined") {
                                         allAccepted = false;
                                     }
-
-                                    if(allAccepted) {
-                                        trip.status = "paying";
-                                    }
                                 };
+                                
+                                if(allAccepted) {
+                                    trip.status = "paying";
+                                }
                             } else {
                                 res.status(400).json({"message":"positive packageConfirmation already provided for this traveller"});
                                 return;
