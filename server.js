@@ -592,7 +592,7 @@ router.route('/trip/updatePackageConfirmation/:tripID')
                         }
 
                         if(trip.travellers[i].packageConfirmation === "declined") {
-                            if(req.body.packageConfirmation === "accepted") {
+                            if(req.body.packageConfirmation == "accepted") {
                                 trip.travellers[i].packageConfirmation = "accepted";
 
                                 var allAccepted = true;
