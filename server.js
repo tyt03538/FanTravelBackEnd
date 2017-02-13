@@ -596,8 +596,8 @@ router.route('/trip/updatePackageConfirmation/:tripID')
                                 trip.travellers[i].packageConfirmation = "accepted";
 
                                 var allAccepted = true;
-                                for (var i = 0; i < trip.travellers.length; i++) {
-                                    if(trip.travellers[i].packageConfirmation === "declined") {
+                                for (var j = 0; j < trip.travellers.length; j++) {
+                                    if(trip.travellers[j].packageConfirmation === "declined") {
                                         allAccepted = false;
                                     }
                                 };
@@ -611,7 +611,6 @@ router.route('/trip/updatePackageConfirmation/:tripID')
                             }
                         }
 
-                        console.log(trip.travellers.length);
                         if(trip.travellers[i].packageConfirmation === "accepted") {
                             res.status(400).json({"message":"positive packageConfirmation already provided for this traveller"});
                             return;
