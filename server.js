@@ -611,7 +611,7 @@ router.route('/trip/updatePackageConfirmation/:tripID')
                             }
                         }
 
-                        console.log(trip.id);
+                        console.log(trip.travellers.length);
                         if(trip.travellers[i].packageConfirmation === "accepted") {
                             res.status(400).json({"message":"positive packageConfirmation already provided for this traveller"});
                             return;
