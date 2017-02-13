@@ -592,7 +592,7 @@ router.route('/trip/updatePackageConfirmation/:tripID')
                         travellerUpdated = true;
                     }
 
-                    if(trip.travllers[i].packageConfirmation === "") {
+                    if(trip.travellers[i].packageConfirmation === "") {
                         allHaveConfirmation = false;
                     }
                 };
