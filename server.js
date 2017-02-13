@@ -583,10 +583,37 @@ router.route('/trip/updatePackageConfirmation/:tripID')
                 var travellerUpdated = false;
                 var allHaveConfirmation = true;
                 for (var i = 0; i < trip.travellers.length; i++) {
-                    if(trip.travellers[i].email == req.body.email) {
-                        trip.travellers[i].packageConfirmation = req.body.packageConfirmation;
-                        if(req.body.packageConfirmation == "declined") {
-                            trip.status = "cancelled";
+                    if(trip.travellers[i].email === req.body.email) {
+                        if(trip.travellers[i].packageConfirmation === "") {
+                            trip.travellers[i].packageConfirmation = req.body.packageConfirmation;
+                            if(req.body.packageConfirmation == "declined") {
+                                trip.status = "cancelled";
+                            }
+                        }
+
+                        if(trip.travellers[i].packageConfirmation === "declined") {
+                            if(req.body.packageConfirmation === "accepted") {
+                                trip.travellers[i].packageConfirmation = "accepted";
+
+                                var allAccepted = true;
+                                for (var i = 0; i < trip.travellers.length; i++) {
+                                    if(trip.travellers[i].packageConfirmation === "declined") {
+                                        allAccepted = false;
+                                    }
+
+                                    if(allAccepted) {
+                                        trip.status = "paying";
+                                    }
+                                };
+                            } else {
+                                res.status(400).json({"message":"positive packageConfirmation already provided for this traveller"});
+                                return;
+                            }
+                        }
+
+                        if(trip.travellers[i].packageConfirmation === "accepted") {
+                            res.status(400).json({"message":"positive packageConfirmation already provided for this traveller"});
+                            return;
                         }
 
                         travellerUpdated = true;
