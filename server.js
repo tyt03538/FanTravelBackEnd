@@ -609,11 +609,11 @@ router.route('/trip/updatePackageConfirmation/:tripID')
                                 res.status(400).json({"message":"positive packageConfirmation already provided for this traveller"});
                                 return;
                             }
-                        }
-
-                        if(trip.travellers[i].packageConfirmation === "accepted") {
-                            res.status(400).json({"message":"positive packageConfirmation already provided for this traveller"});
-                            return;
+                        } else {
+                            if(trip.travellers[i].packageConfirmation === "accepted") {
+                                res.status(400).json({"message":"positive packageConfirmation already provided for this traveller"});
+                                return;
+                            }
                         }
 
                         travellerUpdated = true;
