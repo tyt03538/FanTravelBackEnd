@@ -601,7 +601,7 @@ router.route('/trip/updatePackageConfirmation/:tripID')
                                         allAccepted = false;
                                     }
                                 };
-                                
+
                                 if(allAccepted) {
                                     trip.status = "paying";
                                 }
@@ -611,6 +611,7 @@ router.route('/trip/updatePackageConfirmation/:tripID')
                             }
                         }
 
+                        console.log(trip.id);
                         if(trip.travellers[i].packageConfirmation === "accepted") {
                             res.status(400).json({"message":"positive packageConfirmation already provided for this traveller"});
                             return;
