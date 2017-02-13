@@ -560,6 +560,62 @@ router.route('/trip/updatePackageRank/:tripID')
         })
     })
 
+router.route('/trip/updatePackageConfirmation/:tripID')
+    .post(function(req, res) {
+        var conditions = {"_id": req.params.tripID};
+
+        if(req.body.packageConfirmation == null) {
+            res.status(400).json({"message":"packageConfirmation cannot be null or undefined"});
+            return;
+        }
+
+        if(req.body.email == null) {
+            res.status(400).json({"message":"user email cannot be null or undefined"});
+            return;
+        }
+
+        Trip.findOne(conditions, function(err, trip){
+            if(err) {
+                res.status(500).send(err);
+            }
+
+            if(trip) {
+                var travellerUpdated = false;
+                var allHaveConfirmation = true;
+                for (var i = 0; i < trip.travellers.length; i++) {
+                    if(trip.travellers[i].email == req.body.email) {
+                        trip.travellers[i].packageConfirmation = req.body.packageConfirmation;
+                        if(req.body.packageConfirmation == "declined") {
+                            trip.status = "cancelled";
+                        }
+
+                        travellerUpdated = true;
+                    }
+
+                    if(trip.travllers[i].packageConfirmation === "") {
+                        allHaveConfirmation = false;
+                    }
+                };
+
+                if(!travellerUpdated) {
+                    res.status(404).json({"message":"specified traveller not found"});
+                } else {
+                    if(allHaveConfirmation && trip.status!== 'cancelled') {
+                        trip.status = 'paying';
+                    }
+
+                    trip.save(function(err){
+                        if(err) {
+                            res.status(500).send(err);
+                        }
+                    })
+                }
+            } else {
+                res.status(404).json({"message":"trip not found"});
+            }
+        })
+    })
+
 router.route('/trip/updatePeriod/:tripID')
     .post(function(req, res) {
         var conditions = {"_id":req.params.tripID};
