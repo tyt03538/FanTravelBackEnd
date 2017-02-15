@@ -254,19 +254,19 @@ router.route('/updatePackageConfirmation/:tripID')
                     if(trip.travellers[i].email === req.body.email) {
                         if(trip.travellers[i].packageConfirmation === "") {
                             trip.travellers[i].packageConfirmation = req.body.packageConfirmation;
-                        }
-
-                        if(trip.travellers[i].packageConfirmation === "declined") {
-                            if(req.body.packageConfirmation == "accepted") {
-                                trip.travellers[i].packageConfirmation = "accepted";
-                            } else {
-                                res.status(400).json({"message":"positive packageConfirmation already provided for this traveller"});
-                                return;
-                            }
                         } else {
-                            if(trip.travellers[i].packageConfirmation === "accepted") {
-                                res.status(400).json({"message":"positive packageConfirmation already provided for this traveller"});
-                                return;
+                            if(trip.travellers[i].packageConfirmation === "declined") {
+                                if(req.body.packageConfirmation == "accepted") {
+                                    trip.travellers[i].packageConfirmation = "accepted";
+                                } else {
+                                    res.status(400).json({"message":"positive packageConfirmation already provided for this traveller"});
+                                    return;
+                                }
+                            } else {
+                                if(trip.travellers[i].packageConfirmation === "accepted") {
+                                    res.status(400).json({"message":"positive packageConfirmation already provided for this traveller"});
+                                    return;
+                                }
                             }
                         }
 
