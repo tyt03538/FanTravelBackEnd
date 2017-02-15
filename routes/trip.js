@@ -254,25 +254,11 @@ router.route('/updatePackageConfirmation/:tripID')
                     if(trip.travellers[i].email === req.body.email) {
                         if(trip.travellers[i].packageConfirmation === "") {
                             trip.travellers[i].packageConfirmation = req.body.packageConfirmation;
-                            if(req.body.packageConfirmation == "declined") {
-                                trip.status = "cancelled";
-                            }
                         }
 
                         if(trip.travellers[i].packageConfirmation === "declined") {
                             if(req.body.packageConfirmation == "accepted") {
                                 trip.travellers[i].packageConfirmation = "accepted";
-
-                                var allAccepted = true;
-                                for (var j = 0; j < trip.travellers.length; j++) {
-                                    if(trip.travellers[j].packageConfirmation === "declined") {
-                                        allAccepted = false;
-                                    }
-                                };
-
-                                if(allAccepted) {
-                                    trip.status = "paying";
-                                }
                             } else {
                                 res.status(400).json({"message":"positive packageConfirmation already provided for this traveller"});
                                 return;
@@ -295,8 +281,30 @@ router.route('/updatePackageConfirmation/:tripID')
                 if(!travellerUpdated) {
                     res.status(404).json({"message":"specified traveller not found"});
                 } else {
-                    if(allHaveConfirmation && trip.status!== 'cancelled') {
-                        trip.status = 'paying';
+                    if(allHaveConfirmation) {
+                        for (var i = 0; i < trip.travellers.length; i++) {
+                            if(trip.travellers[i].packageConfirmation == "declined") {
+                                trip.status = "cancelled";
+                            }
+                        };
+
+                        if(trip.status == "cancelled") {
+                            trip.travellers.forEach(function(user){
+                                conditions = {"email":user.email};
+
+                                User.findOne(conditions, function(err, targetUser){
+                                    for (var i = 0; i < targetUser.pendingTrips.length; i++) {
+                                        if(targetUser.pendingTrips[i] == trip.id) {
+                                            targetUser.pendingTrips.splice(i,1);
+                                        }
+                                    };
+                                });
+                            });
+                        }
+
+                        if(trip.status !== "cancelled") {
+                            trip.status = 'paying';
+                        }
                     }
 
                     trip.save(function(err){
