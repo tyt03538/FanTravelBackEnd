@@ -9,7 +9,7 @@ var router = express.Router();              // get an instance of the express Ro
 // =============================================================================
 var Package = require('../app/models/package');
 
-router.route('/package')
+router.route('/')
 	.post(function(req, res){
 		var pkg = new Package();      // create a new instance of the Package model
 
@@ -42,7 +42,7 @@ router.route('/package')
         })
     })
 
-router.route('/package/:packageID')
+router.route('/:packageID')
     .get(function(req, res){
         conditions={"_id": req.params.packageID};
 

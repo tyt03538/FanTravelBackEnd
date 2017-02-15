@@ -7,8 +7,6 @@ var Package = require('./app/models/package');
 
 var matchingEngine = {
 	selectPackage: function(){
-		console.log('checking status for all the trips');
-
 		Trip.find(function(err, trips){
 		    if (err) {
 		        console.log(err);
