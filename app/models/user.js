@@ -11,7 +11,7 @@ var userSchema   = new Schema({
     passport: {
          number: String,
          expiryDate: Date
-    }
+    },
     preferences: [  {
                         prefID : String,
                         pref:[ String ]
