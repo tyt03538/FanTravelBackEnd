@@ -16,20 +16,6 @@ router.route('/')
 
         var user = new User();      // create a new instance of the User model
 
-        if(typeof req.body.lastName !== 'undefined' && req.body.lastName)
-        {
-            user.lastName = req.body.lastName;    
-        } else {
-            user.lastName = ''
-        }
-
-    	if(typeof req.body.title !== 'undefined' && req.body.title)
-    	{
-    	    user.title = req.body.title;
-    	} else {
-    	    user.title = '';
-    	}
-        
         if(typeof req.body.email !== 'undefined' && req.body.email)
         {
             user.email = req.body.email;    
@@ -38,20 +24,6 @@ router.route('/')
             return;
         }
 
-        if(typeof req.body.loginToken !== 'undefined' && req.body.loginToken)
-        {
-            user.loginToken = req.body.loginToken;    
-        } else {
-            user.loginToken = '';
-        }
-        
-        if(typeof req.body.firstName !== 'undefined' && req.body.firstName)
-        {
-            user.firstName = req.body.firstName;
-        } else {
-            user.firstName = '';
-        }
-    	
         if(typeof req.body.preferences !== 'undefined' && req.body.preferences)
         {
             for (var i = 0; i < req.body.preferences.length; i++) {
@@ -61,27 +33,23 @@ router.route('/')
             user.preferences = [];
         }
 
-        if(typeof req.body.friends !== 'undefined' && req.body.friends)
-        {
-            user.friends = req.body.friends;
+        if(req.body.passport == null) {
+            user.passport.number = '';
+            user.passport.expiryDate = '';
         } else {
-            user.friends = [];
+            user.passport.number        = ((req.body.passport.number == null)? '' : req.body.passport.number);
+            user.passport.expiryDate    = ((req.body.passport.expiryDate == null)? '' : req.body.passport.expiryDate); 
         }
 
-    	
-    	if(typeof req.body.pendingTrips !== 'undefined' && req.body.pendingTrips)
-        {
-            user.pendingTrips = req.body.pendingTrips;    
-        } else {
-            user.pendingTrips = [];
-        }
-
-        if(typeof req.body.confirmedTrips !== 'undefined' && req.body.confirmedTrips)
-        {
-            user.confirmedTrips = req.body.confirmedTrips;    
-        } else {
-            user.confirmedTrips = [];
-        }
+        user.lastName           = ((req.body.lastName == null)? '' : req.body.lastName);
+        user.title              = ((req.body.title == null)? '' : req.body.title);
+        user.loginToken         = ((req.body.loginToken == null)? '' : req.body.loginToken);
+        user.firstName          = ((req.body.firstName == null)? '' : req.body.firstName);
+        user.friends            = ((req.body.friends == null)? [] : req.body.friends);
+        user.pendingTrips       = ((req.body.pendingTrips == null)? [] : req.body.pendingTrips);
+        user.confirmedTrips     = ((req.body.confirmedTrips == null)? [] : req.body.confirmedTrips);
+        user.nationality        = ((req.body.nationality == null)? '' : req.body.nationality);
+        user.passport.number    = ((req.body.passport.number ))
 
         // save the user and check for errors
         var conditions = {"email":user.email};
@@ -219,6 +187,11 @@ router.route('/updateProfile/:email')
 
                 if(typeof req.body.confirmedTrips !== 'undefined' && req.body.confirmedTrips) {
                     user.confirmedTrips = req.body.confirmedTrips;    
+                }
+
+                if(typeof req.body.passport !== 'undefined' && req.body.passport) {
+                    user.passport.number = ((req.body.passport.number == null)? '' : req.body.passport.number);
+                    user.passport.expiryDate = ((req.body.passport.expiryDate == null)? '' : req.body.passport.expiryDate);
                 }
 
                 user.save(function(err) {
