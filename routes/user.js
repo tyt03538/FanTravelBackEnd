@@ -49,7 +49,6 @@ router.route('/')
         user.pendingTrips       = ((req.body.pendingTrips == null)? [] : req.body.pendingTrips);
         user.confirmedTrips     = ((req.body.confirmedTrips == null)? [] : req.body.confirmedTrips);
         user.nationality        = ((req.body.nationality == null)? '' : req.body.nationality);
-        user.passport.number    = ((req.body.passport.number ))
 
         // save the user and check for errors
         var conditions = {"email":user.email};
@@ -252,6 +251,7 @@ router.route('/login/:email')
         });
     })
 
+// This method to get the full names of the user in the name list
 router.route('/getFriendName')
     
     // receive an array of user email and return an array containing tuples of email and full name
@@ -284,5 +284,66 @@ router.route('/getFriendName')
             })
         })
     })
+
+// This method is to search users in the whole profile database
+router.route('/searchUser')
+    .post(function(req,res) {
+        if (req.body.searchPhase == null) {
+            res.status(400).json({"message":"search phase cannot be null"});
+        } else {
+            if (req.body.searchPhase == "") {
+                res.status(400).json({"message":"search phase cannot be empty string"});
+            }
+        }
+
+        User.find(function(err, user){
+            var searchSuggestions = [];
+            var numSuggestions = 3;
+
+            for (var i = 0; i < user.length; i++) {
+                // if the user email contains the search phase
+                // index is to locate the position of the substring
+                if( user[i].email.indexOf( req.body.searchPhase ) > -1 ) {
+                    if( searchSuggestions.length < numSuggestions) {
+                        var fullName = user[i].firstName + " " + user[i].lastName
+                        var responseItem = {
+                                        "email": user[i].email,
+                                        "name": fullName
+                                    }
+
+                        searchSuggestions.push(responseItem);
+                    }
+                }
+            }
+
+            // Continue to search the full name \
+            // if the number of email matches is less than numSuggestion
+            /*
+            if( searchSuggestions.length < numSuggestions) {
+                for (var i = 0; i < user.length; i++) {
+                    var fullName = user[i].firstName + " " + user[i].lastName;
+
+                    if (fullName.indexOf(req.body.searchPhase) > -1) {
+                        if( searchSuggestions.length < numSuggestions) {
+                            var responseItem = {
+                                            "email": user[i].email,
+                                            "name": fullName
+                                        }
+
+                            searchSuggestions.push(responseItem);
+                        }
+                    }
+                }
+            }
+            */
+
+            if(searchSuggestions.length > 0) {
+                res.status(200).json(searchSuggestions);
+            } else {
+                res.status(200).json({"message" : "no matches in the database"});
+            }
+        })
+    })
+
 
 module.exports = router;
