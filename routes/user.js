@@ -4,6 +4,7 @@
 // =============================================================================
 var express = require('express');
 var router = express.Router();              // get an instance of the express Router
+var async = require('async');
 
 // Related Schema
 // =============================================================================
@@ -340,7 +341,60 @@ router.route('/searchUser')
             if(searchSuggestions.length > 0) {
                 res.status(200).json(searchSuggestions);
             } else {
-                res.status(200).json({"message" : "no matches in the database"});
+                res.status(404).json({"message" : "no matches in the database"});
+            }
+        })
+    })
+
+router.route('/addUserAsFriend/:email')
+    .post(function(req, res){
+        if(req.body.userList == null) {
+            res.status(400).json({"message":"userList cannot be empty"});
+        }
+
+        var allAdded = true;
+        async.eachSeries(req.body.userList, function(email, next){
+            var conditions = {"email":email};
+
+            User.findOne(conditions, function(err, user){
+                if (err) {
+                    res.status(500).send(err);
+                }
+
+                if(user !== null) {
+                    if(user.friends.indexOf(req.params.email) == -1) {
+                        user.friends.push(req.params.email);
+                        user.save(function(err){
+                            if(err) {
+                                res.status(500).send(err);
+                            }
+                        })
+
+                        var conditions = {"email":req.params.email};
+                        User.findOne(conditions, function(err, user){
+                            user.friends.push(email);
+                            user.save(function(err){
+                                if(err) {
+                                    res.status(500).send(err);
+                                }
+                            })
+                            next();
+                        })
+                    } else {
+                        allAdded = false;
+                        next();
+                    }
+                } else {
+                    allAdded = false;
+                    next();
+                }
+            });
+        }, function(err){
+
+            if(allAdded) {
+                res.status(200).json({"message":"all users in the list are successfully added"});
+            } else {
+                res.status(200).json({"message":"only some users, if not none, in the list are successfully added"});
             }
         })
     })

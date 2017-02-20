@@ -78,11 +78,11 @@ router.route('/')
             }
         });
 
-	var numTraveller = trip.travellers.length;
-	var processed = 0;
-	var reqResult;
-	
-	trip.travellers.forEach(function(user) {
+    	var numTraveller = trip.travellers.length;
+    	var processed = 0;
+    	var reqResult;
+    	
+    	trip.travellers.forEach(function(user) {
             var conditions={"email":user.email};
             
             User.findOne(conditions, function(err, user) {
@@ -99,20 +99,20 @@ router.route('/')
                     reqResult = false;
                 }
 				
-		processed++;
-				
-		if(processed == numTraveller)
-		{
-			if (reqResult)
-			{
-				responseBody = {"tripID":trip.id};
-				res.status(200).json(responseBody);    
-			} else {
-				res.status(400).json({"message":"At least one of the travellers do not exist"});
-				conditions = {"_id":trip.id};
-				Trip.find(conditions).remove().exec();
-			}
-		};
+        		processed++;
+        				
+        		if(processed == numTraveller)
+        		{
+        			if (reqResult)
+        			{
+        				responseBody = {"tripID":trip.id};
+        				res.status(200).json(responseBody);    
+        			} else {
+        				res.status(400).json({"message":"At least one of the travellers do not exist"});
+        				conditions = {"_id":trip.id};
+        				Trip.find(conditions).remove().exec();
+        			}
+        		};
             });
         });
     })
