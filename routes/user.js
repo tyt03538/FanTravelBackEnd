@@ -189,6 +189,10 @@ router.route('/updateProfile/:email')
                     user.confirmedTrips = req.body.confirmedTrips;    
                 }
 
+                if(typeof req.body.nationality !== 'undefined' && req.body.nationality) {
+                    user.nationality = req.body.nationality;
+                }
+
                 if(typeof req.body.passport !== 'undefined' && req.body.passport) {
                     user.passport.number = ((req.body.passport.number == null)? '' : req.body.passport.number);
                     user.passport.expiryDate = ((req.body.passport.expiryDate == null)? '' : req.body.passport.expiryDate);
