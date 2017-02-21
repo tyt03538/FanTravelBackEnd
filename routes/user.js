@@ -19,7 +19,7 @@ router.route('/')
 
         if(typeof req.body.email !== 'undefined' && req.body.email)
         {
-            user.email = req.body.email;    
+            user.email = req.body.email;
         } else {
             res.status(400).json({"message":"email of the user cannot be empty"});
             return;
@@ -29,7 +29,7 @@ router.route('/')
         {
             for (var i = 0; i < req.body.preferences.length; i++) {
                 user.preferences.push(req.body.preferences[i]);
-            };  
+            };
         } else {
             user.preferences = [];
         }
@@ -37,9 +37,11 @@ router.route('/')
         if(req.body.passport == null) {
             user.passport.number = '';
             user.passport.expiryDate = '';
+            user.passport.nationality = '';
         } else {
             user.passport.number        = ((req.body.passport.number == null)? '' : req.body.passport.number);
-            user.passport.expiryDate    = ((req.body.passport.expiryDate == null)? '' : req.body.passport.expiryDate); 
+            user.passport.expiryDate    = ((req.body.passport.expiryDate == null)? '' : req.body.passport.expiryDate);
+            user.passport.nationality   = ((req.body.passport.nationality == null)? '' : req.body.passport.nationality);
         }
 
         user.lastName           = ((req.body.lastName == null)? '' : req.body.lastName);
@@ -49,7 +51,6 @@ router.route('/')
         user.friends            = ((req.body.friends == null)? [] : req.body.friends);
         user.pendingTrips       = ((req.body.pendingTrips == null)? [] : req.body.pendingTrips);
         user.confirmedTrips     = ((req.body.confirmedTrips == null)? [] : req.body.confirmedTrips);
-        user.nationality        = ((req.body.nationality == null)? '' : req.body.nationality);
 
         // save the user and check for errors
         var conditions = {"email":user.email};
@@ -120,7 +121,7 @@ router.route('/updatePreferences/:email')
                         }
                     };
                 }
-                
+
 
                 user.save(function(err) {
                     if (err) {
@@ -134,7 +135,7 @@ router.route('/updatePreferences/:email')
                 res.status(404).json({"message":"user not found"});
             }
         })
-    }) 
+    })
 
 router.route('/updateProfile/:email')
     // update the profile of a user (accessed at POST http://localhost:8080/api/user/updateProfile)
@@ -152,25 +153,25 @@ router.route('/updateProfile/:email')
                 res.status(404).json({"message":"user not found"});
             } else {
                 if(typeof req.body.lastName !== 'undefined' && req.body.lastName) {
-                    user.lastName = req.body.lastName;    
+                    user.lastName = req.body.lastName;
                 }
 
                 if(typeof req.body.title !== 'undefined' && req.body.title) {
                     user.title = req.body.title;
                 }
-                
+
                 if(typeof req.body.email !== 'undefined' && req.body.email) {
-                    user.email = req.body.email;    
+                    user.email = req.body.email;
                 }
 
                 if(typeof req.body.loginToken !== 'undefined' && req.body.loginToken) {
-                    user.loginToken = req.body.loginToken;    
+                    user.loginToken = req.body.loginToken;
                 }
-                
+
                 if(typeof req.body.firstName !== 'undefined' && req.body.firstName) {
                     user.firstName = req.body.firstName;
                 }
-                
+
                 if(typeof req.body.preferences !== 'undefined' && req.body.preferences) {
                     for (var i = 0; i < req.body.preferences.length; i++) {
                         user.preferences.push(req.body.preferences[i]);
@@ -180,22 +181,19 @@ router.route('/updateProfile/:email')
                 if(typeof req.body.friends !== 'undefined' && req.body.friends) {
                     user.friends = req.body.friends;
                 }
-                
+
                 if(typeof req.body.pendingTrips !== 'undefined' && req.body.pendingTrips) {
-                    user.pendingTrips = req.body.pendingTrips;    
+                    user.pendingTrips = req.body.pendingTrips;
                 }
 
                 if(typeof req.body.confirmedTrips !== 'undefined' && req.body.confirmedTrips) {
-                    user.confirmedTrips = req.body.confirmedTrips;    
-                }
-
-                if(typeof req.body.nationality !== 'undefined' && req.body.nationality) {
-                    user.nationality = req.body.nationality;
+                    user.confirmedTrips = req.body.confirmedTrips;
                 }
 
                 if(typeof req.body.passport !== 'undefined' && req.body.passport) {
                     user.passport.number = ((req.body.passport.number == null)? '' : req.body.passport.number);
                     user.passport.expiryDate = ((req.body.passport.expiryDate == null)? '' : req.body.passport.expiryDate);
+                    user.passport.nationality = ((req.body.passport.nationality == null)? '' : req.body.passport.nationality);
                 }
 
                 user.save(function(err) {
@@ -221,11 +219,11 @@ router.route('/:email')
             }
 
             if(user) {
-                res.status(200).json(user.toJSON());    
+                res.status(200).json(user.toJSON());
             } else {
                 res.status(404).json({"message":"user not found"});
             }
-			
+
 		});
 	})
 
@@ -254,17 +252,17 @@ router.route('/login/:email')
 
 // This method to get the full names of the user in the name list
 router.route('/getFriendName')
-    
+
     // receive an array of user email and return an array containing tuples of email and full name
     .post(function(req, res) {
         var numFriends = req.body.friendList.length;
         var result = [];
         var reqResult = true;
         var processed = 0;
-        
+
         req.body.friendList.forEach(function(friend) {
             var conditions = {"email": friend};
-            
+
             User.findOne(conditions, function(err,user) {
                 if(user !== null) {
                     var fullName = user.firstName + " " + user.lastName;
@@ -272,9 +270,9 @@ router.route('/getFriendName')
                 } else {
                     reqResult = false;
                 }
-                
+
                 processed++;
-                
+
                 if (processed == numFriends) {
                     if(reqResult) {
                         res.status(200).json(result);

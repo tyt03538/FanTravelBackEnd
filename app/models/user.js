@@ -7,10 +7,10 @@ var userSchema   = new Schema({
     loginToken: String,
     firstName: String,
     lastName: String,
-    nationality: String,
     passport: {
-         number: String,
-         expiryDate: Date
+          nationality: String,
+          number: String,
+          expiryDate: Date
     },
     preferences: [  {
                         prefID : String,
