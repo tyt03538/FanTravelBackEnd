@@ -351,6 +351,7 @@ router.route('/addUserAsFriend/:email')
         }
 
         var allAdded = true;
+        var friendAdded = 0;
         async.eachSeries(req.body.userList, function(email, next){
             var conditions = {"email":email};
 
@@ -360,6 +361,7 @@ router.route('/addUserAsFriend/:email')
                 }
 
                 if(user !== null) {
+                    // if the friend to add is not in the friend list
                     if(user.friends.indexOf(req.params.email) == -1) {
                         user.friends.push(req.params.email);
                         user.save(function(err){
@@ -376,26 +378,88 @@ router.route('/addUserAsFriend/:email')
                                     res.status(500).send(err);
                                 }
                             })
+                            friendAdded++;
                             next();
                         })
                     } else {
+                        // the friend is already in the list
                         allAdded = false;
                         next();
                     }
                 } else {
+                    // the friend cannot be found
                     allAdded = false;
                     next();
                 }
             });
-        }, function(err){
-
+        }, function(err) {
             if(allAdded) {
                 res.status(200).json({"message":"all users in the list are successfully added"});
-            } else {
-                res.status(200).json({"message":"only some users, if not none, in the list are successfully added"});
-            }
+            } else
+                if(friendAdded > 0) {
+                    res.status(207).json({"message":"only some users in the list are successfully added"});
+                } else {
+                    res.status(400).json({"message":"none of the friends in the list are successfully added"});
+                }
         })
     })
 
+router.route('/deleteFriend/:email')
+    .post(function(req, res) {
+        if(req.body.userList == null) {
+            res.status(400).json({"message":"friend to be deleted cannot be null or undefined"});
+        }
+
+        if(req.body.userList.length == 0) {
+           res.status(400).json({"message":"the of friends is empty"});
+        }
+
+        var conditions = {"email":req.params.email};
+        var deletionList = req.body.userList;
+
+        User.findOne(conditions, function(err, user) {
+            var allDeleted = true;
+            var numDeleted = 0;
+
+            // Delete the friend email in the list
+            for (var i = 0; i < deletionList.length; i++) {
+                var deleteIndex = user.friends.indexOf(deletionList[i]);
+
+                if(deleteIndex > -1) {
+                    user.friends.splice(deleteIndex, 1);
+
+                    var conditions = {"email":deletionList[i]};
+                    User.findOne(conditions, function(err, user) {
+                        var deleteIndex = user.friends.indexOf(req.params.email);
+
+                        user.friends.splice(deleteIndex, 1);
+                        user.save(function(err){
+                            if(err) {
+                                res.status(500).send(err);
+                            }
+                        })
+                    });
+                    numDeleted++;
+                } else {
+                    allDeleted = false;
+                }
+            }
+
+            user.save(function(err) {
+                if(err) {
+                    res.status(500).send(err);
+                }
+
+                if(allDeleted) {
+                    res.status(200).json({"message":"all friends deleted successfully"});
+                } else
+                    if(numDeleted > 0) {
+                        res.status(207).json({"message":"some friends cannot be deleted"});
+                    } else {
+                        res.status(400).json({"message":"none of the friends are deleted"});
+                    }
+            });
+        });
+    })
 
 module.exports = router;
