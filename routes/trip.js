@@ -14,10 +14,10 @@ var Package = require('../app/models/package');
 router.route('/')
     // create a trip (accessed at POST http://localhost:8080/api/trip)
     .post(function(req, res) {
-        
+
         var trip = new Trip();      // create a new instance of the User model
         reqResult = true;
-        
+
         trip.tripID = '',
         trip.status = 'scheduling';
 
@@ -68,8 +68,8 @@ router.route('/')
             trip.paymentMethod = '';
         }
 
-        trip.packageAssigned = [];
-        trip.packageChosen = [];
+        trip.packageAssigned = ((req.body.packageAssigned == null)? [] : req.body.packageAssigned);
+        trip.packageChosen = ((req.body.packageChosen == null)? "" : req.body.packageChosen);
 
         // save the user and check for errors
         trip.save(function(err) {
@@ -81,10 +81,10 @@ router.route('/')
     	var numTraveller = trip.travellers.length;
     	var processed = 0;
     	var reqResult;
-    	
+
     	trip.travellers.forEach(function(user) {
             var conditions={"email":user.email};
-            
+
             User.findOne(conditions, function(err, user) {
                 if( user !== null )
                 {
@@ -98,25 +98,33 @@ router.route('/')
                 {
                     reqResult = false;
                 }
-				
-        		processed++;
-        				
-        		if(processed == numTraveller)
-        		{
-        			if (reqResult)
-        			{
-        				responseBody = {"tripID":trip.id};
-        				res.status(200).json(responseBody);    
-        			} else {
-        				res.status(400).json({"message":"At least one of the travellers do not exist"});
-        				conditions = {"_id":trip.id};
-        				Trip.find(conditions).remove().exec();
-        			}
-        		};
+
+            		processed++;
+
+            		if(processed == numTraveller)
+            		{
+              			if (reqResult)
+              			{
+                        if(trip.paymentMethod == "together") {
+                            for (var i = 0; i < trip.travellers.length; i++) {
+                                if(trip.travellers[i].email !== trip.initiator) {
+                                      trip.travellers[i].paymentStatus = "N/A";
+                                }
+                            }
+                        }
+
+                				responseBody = {"tripID":trip.id};
+                				res.status(200).json(responseBody);
+              			} else {
+                				res.status(400).json({"message":"At least one of the travellers do not exist"});
+                				conditions = {"_id":trip.id};
+                				Trip.find(conditions).remove().exec();
+              			}
+            		};
             });
         });
     })
-    
+
     // retrieve all the trips exist in the database
     .get(function(req, res) {
         Trip.find(function(err, trip) {
@@ -211,7 +219,7 @@ router.route('/updatePackageRank/:tripID')
                             };
 
                         };
-                        trip.status = "confirming";        
+                        trip.status = "confirming";
                     }
 
                     trip.save(function(err) {
@@ -252,17 +260,22 @@ router.route('/updatePackageConfirmation/:tripID')
                 var allHaveConfirmation = true;
                 for (var i = 0; i < trip.travellers.length; i++) {
                     if(trip.travellers[i].email === req.body.email) {
+                        // if the packageConfirmation is empty just update with the body
                         if(trip.travellers[i].packageConfirmation === "") {
                             trip.travellers[i].packageConfirmation = req.body.packageConfirmation;
                         } else {
+                            // if the confirmation is not empty check if positive response already received
+                            // if previously declined, allow it to be switched
                             if(trip.travellers[i].packageConfirmation === "declined") {
                                 if(req.body.packageConfirmation == "accepted") {
                                     trip.travellers[i].packageConfirmation = "accepted";
                                 } else {
+                                    // if previously accepted, don't allow it to be switched
                                     res.status(400).json({"message":"positive packageConfirmation already provided for this traveller"});
                                     return;
                                 }
                             } else {
+                                // if already accepted, don't allow to switch back
                                 if(trip.travellers[i].packageConfirmation === "accepted") {
                                     res.status(400).json({"message":"positive packageConfirmation already provided for this traveller"});
                                     return;
@@ -270,9 +283,11 @@ router.route('/updatePackageConfirmation/:tripID')
                             }
                         }
 
+                        // signal the traveller in the body is found
                         travellerUpdated = true;
                     }
 
+                    // check if all the travellers already have pkg confirmation
                     if(trip.travellers[i].packageConfirmation === "") {
                         allHaveConfirmation = false;
                     }
@@ -310,6 +325,16 @@ router.route('/updatePackageConfirmation/:tripID')
 
                         if(trip.status !== "cancelled") {
                             trip.status = 'paying';
+
+                            // reconfirm if pay together, other travllers have payment status as N/A
+                            // except initiator
+                            if(trip.paymentMethod == "together") {
+                                for (var i = 0; i < trip.travellers.length; i++) {
+                                    if(trip.travellers[i].email !== trip.initiator) {
+                                          trip.travellers[i].paymentStatus = "N/A";
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -327,6 +352,101 @@ router.route('/updatePackageConfirmation/:tripID')
         })
     })
 
+router.route('/updatePaymentStatus/:tripID')
+    .post(function(req, res){
+        var conditions = {"_id":req.params.tripID};
+
+        if(req.body.paymentStatus == null) {
+            res.status(400).json({"message":"new payment status cannot be null or undefined"});
+        }
+
+        if(req.body.email == null) {
+            res.status(400).json({"message":"user email cannot be null or undefined"});
+        }
+
+        Trip.findOne(conditions, function(err, trip) {
+            if(err) {
+                res.status(500).send(err);
+            }
+
+            if(trip) {
+                var travellerUpdated = false;
+                var allUpdated = true;
+
+                // search and locate the traveller to be updated
+                for (var i = 0; i < trip.travellers.length; i++) {
+                    if(trip.travellers[i].email == req.body.email) {
+                        if(trip.travellers[i].paymentStatus == "N/A") {
+                            res.status(400).json({"message":"this traveller does not need to pay. Payment method is together"});
+                        } else {
+                            trip.travellers[i].paymentStatus = req.body.paymentStatus;
+                        }
+
+                        travellerUpdated = true;
+                    }
+
+                    if(trip.travellers[i].paymentStatus == "") {
+                        allUpdated = false;
+                    }
+                }
+
+                // traveller does not exist in the list
+                if(!travellerUpdated) {
+                    res.status(404).json({"message":"traveller not found"});
+                }
+
+                // all travellers have payment status, either N/A or paid
+                if(allUpdated) {
+                    var numTraveller = trip.travellers.length;
+                    var processed = 0;
+                    var reqResult = false;
+
+                    trip.status = "completed";
+                    trip.travellers.forEach(function(user) {
+                        var conditions={"email":user.email};
+
+                        User.findOne(conditions, function(err, user) {
+                            if( user !== null )
+                            {
+                                user.confirmedTrips.push(trip.id);
+                                var tripToDelete = user.pendingTrips.indexOf(trip.id);
+                                user.pendingTrips.splice(tripToDelete, 1);
+
+                                user.save(function(err) {
+                                    if (err)
+                                        res.status(500).send(err);
+                                });
+                            }
+
+                            processed++;
+
+                            if(processed == numTraveller)
+                            {
+                                trip.save(function(err) {
+                                    if(err) {
+                                        res.status(500).send(err);
+                                    }
+
+                                    res.status(200).json({"message":"payment accepted and the trip is confirmed"});
+                                });
+                            };
+                        });
+                    });
+                } else {
+                    trip.save(function(err) {
+                        if(err) {
+                            res.status(500).send(err);
+                        }
+
+                        res.status(200).json({"message":"payment accepted"});
+                    });
+                }
+            } else {
+                res.status(404).send({"message":"trip not found"});
+            }
+        });
+    });
+
 router.route('/updatePeriod/:tripID')
     .post(function(req, res) {
         var conditions = {"_id":req.params.tripID};
@@ -343,7 +463,7 @@ router.route('/updatePeriod/:tripID')
 
         Trip.findOne(conditions, function(err, trip) {
             if(err) {
-                res.status(400).send(err);
+                res.status(500).send(err);
             }
 
             if(trip) {
@@ -393,7 +513,7 @@ router.route('/updatePeriod/:tripID')
                         };
 
                         for (var j = 0; j <  trip.travellers[i].availableDates.length; j++) {
-                            if ( trip.travellers[i].availableDates[j] == null) {         
+                            if ( trip.travellers[i].availableDates[j] == null) {
                                  trip.travellers[i].availableDates.splice(j, 1);
                                 j--;
                             }
@@ -463,7 +583,7 @@ router.route('/updatePeriod/:tripID')
                     };
 
                     for (var i = 0; i < tmpPeriod.length; i++) {
-                        if (tmpPeriod[i] == null) {         
+                        if (tmpPeriod[i] == null) {
                             tmpPeriod.splice(i, 1);
                             i--;
                         }
@@ -482,7 +602,7 @@ router.route('/updatePeriod/:tripID')
 
                     res.status(200).json({"message":"trip period successfully updated"});
                 });
-                
+
 
             } else {
                 res.status(404).json({"message":"trip not found"});

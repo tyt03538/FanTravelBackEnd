@@ -18,7 +18,7 @@ var tripSchema   = new Schema({
 	targetDestination: String,
 	packageAssigned: [ String ],
 	packageChosen: String,
-	paymentMethod: String
+	paymentMethod: String // paymentMethod = together, split
 });
 
 tripSchema.options.toJSON = {
