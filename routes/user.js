@@ -191,9 +191,17 @@ router.route('/updateProfile/:email')
                 }
 
                 if(typeof req.body.passport !== 'undefined' && req.body.passport) {
-                    user.passport.number = ((req.body.passport.number == null)? '' : req.body.passport.number);
-                    user.passport.expiryDate = ((req.body.passport.expiryDate == null)? '' : req.body.passport.expiryDate);
-                    user.passport.nationality = ((req.body.passport.nationality == null)? '' : req.body.passport.nationality);
+                    if(req.body.passport.nationality !== 'undefined' && req.body.passport.nationality) {
+                        user.passport.nationality = req.body.passport.nationality;
+                    }
+
+                    if(req.body.passport.number !== 'undefined' && req.body.passport.number) {
+                        user.passport.number = req.body.passport.number;
+                    }
+
+                    if(req.body.passport.expiryDate !== 'undefined' && req.body.passport.expiryDate) {
+                        user.passport.expiryDate = req.body.passport.expiryDate;
+                    }
                 }
 
                 user.save(function(err) {
