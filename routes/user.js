@@ -305,7 +305,7 @@ router.route('/searchUser')
 
         User.find(function(err, user){
             var searchSuggestions = [];
-            var numSuggestions = 3;
+            var numSuggestions = 5;
 
             for (var i = 0; i < user.length; i++) {
                 // if the user email contains the search phase

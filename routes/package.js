@@ -8,6 +8,7 @@ var router = express.Router();              // get an instance of the express Ro
 // Related Schema
 // =============================================================================
 var Package = require('../app/models/package');
+var Hotel = require('../app/models/hotel');
 
 router.route('/')
 	.post(function(req, res){
@@ -59,5 +60,44 @@ router.route('/:packageID')
             }
         })
     })
+
+router.route('/hotel')
+		.post(function(req, res){
+				var hotelsToInsert = req.body.hotels;
+				var processed = 0;
+
+				for (var i = 0; i < hotelsToInsert.length; i++) {
+						var hotel = new Hotel();
+
+						hotel.destination = hotelsToInsert[i].destination;
+						hotel.name = hotelsToInsert[i].name;
+						hotel.checkinTime = hotelsToInsert[i].checkinTime;
+				    hotel.checkoutTime = hotelsToInsert[i].checkoutTime;
+				    hotel.price = hotelsToInsert[i].price;
+				    hotel.address = hotelsToInsert[i].address;
+
+						hotel.save(function(err){
+								if(err) {
+										res.status(500).send(err);
+								}
+
+								processed++;
+
+								if(processed == hotelsToInsert.length) {
+										res.status(200).json({"message":"all hotels inserted successfully"});
+								}
+						})
+				}
+		})
+
+		.get(function(req, res){
+				Hotel.find(function(err, hotel){
+						if(err) {
+								res.status(500).send(err);
+						}
+
+						res.status(200).json(hotel);
+				})
+		})
 
 module.exports = router;
