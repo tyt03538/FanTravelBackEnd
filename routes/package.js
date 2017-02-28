@@ -9,6 +9,7 @@ var router = express.Router();              // get an instance of the express Ro
 // =============================================================================
 var Package = require('../app/models/package');
 var Hotel = require('../app/models/hotel');
+var Flight = require('../app/models/flight');
 
 router.route('/')
 	.post(function(req, res){
@@ -61,7 +62,7 @@ router.route('/:packageID')
         })
     })
 
-router.route('/hotel')
+router.route('/hotel/_upload')
 		.post(function(req, res){
 				var hotelsToInsert = req.body.hotels;
 				var processed = 0;
@@ -90,6 +91,7 @@ router.route('/hotel')
 				}
 		})
 
+router.route('/hotel/_retrieve')
 		.get(function(req, res){
 				Hotel.find(function(err, hotel){
 						if(err) {
@@ -97,6 +99,42 @@ router.route('/hotel')
 						}
 
 						res.status(200).json(hotel);
+				})
+		})
+
+router.route('/flight/_upload')
+		.post(function(req, res){
+				var flightsToInsert = req.body.flights;
+				var processed = 0;
+
+				for (var i = 0; i < flightsToInsert.length; i++) {
+						var flight = new Flight();
+
+						flight.destination 	= flightsToInsert[i].destination;
+						flight.flights 			= flightsToInsert[i].flights;
+
+						flight.save(function(err){
+								if(err) {
+										res.status(500).send(err);
+								}
+
+								processed++;
+
+								if(processed == flightsToInsert.length) {
+										res.status(200).json({"message":"all flights inserted successfully"});
+								}
+						})
+				}
+		})
+
+router.route('/flight/_retrieve')
+		.get(function(req, res){
+				Flight.find(function(err, flight){
+						if(err) {
+								res.status(500).send(err);
+						}
+
+						res.status(200).json(flight);
 				})
 		})
 

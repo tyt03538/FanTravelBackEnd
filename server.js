@@ -16,6 +16,9 @@ var indexRouter = require('./routes');
 
 // The matching engine
 var matchingEngine = require('./matchingEngine');
+
+// The packageGenerator
+var pkgGen = require('./pkgGen.js');
 // configure app to use bodyParser()
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -27,12 +30,13 @@ var port = process.env.PORT || 8080;        // set our port
 // all of our routes will be prefixed with /api
 app.use('/api', indexRouter);
 
-// The following is the periodic function 
-// It is to check if there are any trips that 
+// The following is the periodic function
+// It is to check if there are any trips that
 // have all schedules collected from the travellers
-setInterval(function () { 
+setInterval(function () {
     console.log('checking status for all the trips');
     matchingEngine.selectPackage();
+    pkgGen.generate();
 }, 3000);
 
 // more routes for our API will happen here
