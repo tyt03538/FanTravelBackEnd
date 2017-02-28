@@ -36,8 +36,13 @@ app.use('/api', indexRouter);
 setInterval(function () {
     console.log('checking status for all the trips');
     matchingEngine.selectPackage();
-    pkgGen.generate();
+    console.log('all trips checked - server.js');
 }, 3000);
+
+setInterval(function () {
+    pkgGen.generate();
+}, 60000);
+
 
 // more routes for our API will happen here
 

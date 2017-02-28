@@ -5,6 +5,7 @@ var flightSchema = new Schema({
 	flightNumber: String,
 	departureDate: Date,
 	arrivalDate: Date,
+	flightDuration: String,
 	price: Number,
 	departurePort: String,
 	arrivalPort: String
