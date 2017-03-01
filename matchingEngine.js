@@ -10,36 +10,46 @@ var destList = require('./destList');
 var matchingEngine = {
 	cancelOutdatedTrip: function() {
 		Trip.find(function(err, trip){
-			for (var i = 0; i < trip.length; i++) {
-				if (trip[i].period.length > 0) {
+			async.eachSeries(trip, function(trip, next){
+				if (trip.period.length > 0) {
 					var curDate = new Date();
-					if (trip[i].status != "scheduling" && trip[i].period[0].startDate < curDate) {
-						trip[i].status = "cancelled";
+					if (trip.status != "scheduling" && trip.period[0].startDate < curDate) {
+						trip.status = "cancelled";
 
-						for (var j = 0; j < trip[i].travellers.length; j++) {
-							var conditions = { email : trip[i].travellers[j].email };
+						async.eachSeries(trip.travellers, function(user, next){
+							var conditions = { email : user.email };
 
-							User.findOne(conditions, function(err, user){
-								var indexToDel = user.pendingTrips.indexOf(trip[i].id);
+							User.findOne(conditions, function(err, targetUser){
+								var indexToDel = targetUser.pendingTrips.indexOf(trip.id);
 
-								user.pendingTrips.splice(indexToDel, 1);
+								targetUser.pendingTrips.splice(indexToDel, 1);
 
-								user.save(function(err){
+								targetUser.save(function(err){
 									if (err) {
 										console.log(err);
 									}
+
+									next();
 								})
 							})
-						}
+						}, function(err){
+							if (err) {
+								throw err;
+							}
+						})
 
-						trip[i].save(function(err){
+						trip.save(function(err){
 							if (err) {
 								console.log(err);
 							}
 						});
 					}
 				}
-			}
+			}, function(err) {
+				if (err) {
+					throw err;
+				}
+			})
 		})
 	},
 
