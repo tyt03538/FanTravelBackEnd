@@ -177,8 +177,6 @@ var matchingEngine = {
 										if (err) {
 											console.log(err);
 										}
-
-										callback();
 									});
 								} else {
 									console.log("package not found");
@@ -187,15 +185,15 @@ var matchingEngine = {
 							})
 						};
 
-
 						trip.save(function(err){
 							if (err) {
 								console.log(err);
 							}
-
 							callback();
 						})
 					})
+				} else {
+					callback();
 				}
 			}, function(err){
 				if (err) {
