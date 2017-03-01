@@ -4,6 +4,7 @@ var async = require('async');
 
 var Trip = require('./app/models/trip');
 var Package = require('./app/models/package');
+var User = require('./app/models/user');
 var destList = require('./destList');
 
 var matchingEngine = {
@@ -12,8 +13,24 @@ var matchingEngine = {
 			for (var i = 0; i < trip.length; i++) {
 				if (trip[i].period.length > 0) {
 					var curDate = new Date();
-					if (trip[i].period[0].startDate < curDate) {
+					if (trip[i].status != "scheduling" && trip[i].period[0].startDate < curDate) {
 						trip[i].status = "cancelled";
+
+						for (var j = 0; j < trip[i].travellers.length; j++) {
+							var conditions = { email : trip[i].travellers[j].email };
+
+							User.findOne(conditions, function(err, user){
+								var indexToDel = user.pendingTrips.indexOf(trip[i].id);
+
+								user.pendingTrips.splice(indexToDel, 1);
+
+								user.save(function(err){
+									if (err) {
+										console.log(err);
+									}
+								})
+							})
+						}
 
 						trip[i].save(function(err){
 							if (err) {
