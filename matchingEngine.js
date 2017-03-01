@@ -54,6 +54,7 @@ var matchingEngine = {
 	},
 
 	selectPackage: function(){
+		console.log("selecting packages");
 		Trip.find(function(err, trips){
 			if (err) {
 				console.log(err);
