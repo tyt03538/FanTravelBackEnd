@@ -177,6 +177,8 @@ var matchingEngine = {
 										if (err) {
 											console.log(err);
 										}
+
+										callback();
 									});
 								} else {
 									console.log("package not found");
