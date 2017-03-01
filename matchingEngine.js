@@ -15,7 +15,7 @@ var matchingEngine = {
 					if (trip[i].period[0].startDate < curDate) {
 						trip[i].status = "cancelled";
 
-						trip.save(function(err){
+						trip[i].save(function(err){
 							if (err) {
 								console.log(err);
 							}
