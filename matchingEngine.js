@@ -59,7 +59,7 @@ var matchingEngine = {
 			if (err) {
 				console.log(err);
 			}
-
+			console.log(trips.length);
 			async.eachSeries(trips, function(trip, callback){
 				if (trip.status == "pendingPackages") {
 					console.log(trip.id+" is ready to be assigned with packages");
