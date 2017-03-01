@@ -35,6 +35,7 @@ app.use('/api', indexRouter);
 // have all schedules collected from the travellers
 setInterval(function () {
     console.log('checking status for all the trips');
+    matchingEngine.cancelOutdatedTrip();
     matchingEngine.selectPackage();
     console.log('all trips checked - server.js');
 }, 3000);

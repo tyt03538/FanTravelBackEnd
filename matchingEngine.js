@@ -7,6 +7,25 @@ var Package = require('./app/models/package');
 var destList = require('./destList');
 
 var matchingEngine = {
+	cancelOutdatedTrip: function() {
+		Trip.find(function(err, trip){
+			for (var i = 0; i < trip.length; i++) {
+				if (trip[i].period.length > 0) {
+					var curDate = new Date();
+					if (trip[i].period[0].startDate < curDate) {
+						trip[i].status = "cancelled";
+
+						trip.save(function(err){
+							if (err) {
+								console.log(err);
+							}
+						});
+					}
+				}
+			}
+		})
+	},
+
 	selectPackage: function(){
 		Trip.find(function(err, trips){
 			if (err) {
