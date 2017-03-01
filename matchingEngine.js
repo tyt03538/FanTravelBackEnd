@@ -13,7 +13,7 @@ var matchingEngine = {
 			async.eachSeries(trip, function(trip, next){
 				if (trip.period.length > 0) {
 					var curDate = new Date();
-					if (trip.status != "scheduling" && trip.period[0].startDate < curDate) {
+					if (trip.status != "scheduling" && trip.status != "completed" && trip.period[0].startDate < curDate) {
 						trip.status = "cancelled";
 
 						async.eachSeries(trip.travellers, function(user, next){
