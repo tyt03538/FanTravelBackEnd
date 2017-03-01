@@ -297,10 +297,22 @@ router.route('/searchUser')
     .post(function(req,res) {
         if (req.body.searchPhase == null) {
             res.status(400).json({"message":"search phase cannot be null"});
+            return;
         } else {
             if (req.body.searchPhase == "") {
                 res.status(400).json({"message":"search phase cannot be empty string"});
+                return;
             }
+        }
+
+        function checkEmailExistinArray(array, item) {
+          for (var i = 0; i < array.length; i++) {
+            if (array[i].email === item) {
+              return true;
+            }
+          }
+
+          return false;
         }
 
         User.find(function(err, user){
@@ -310,7 +322,7 @@ router.route('/searchUser')
             for (var i = 0; i < user.length; i++) {
                 // if the user email contains the search phase
                 // index is to locate the position of the substring
-                if( user[i].email.indexOf( req.body.searchPhase ) > -1 ) {
+                if( user[i].email.indexOf( req.body.searchPhase ) == 0 ) {
                     if( searchSuggestions.length < numSuggestions) {
                         var fullName = user[i].firstName + " " + user[i].lastName
                         var responseItem = {
@@ -321,6 +333,46 @@ router.route('/searchUser')
                         searchSuggestions.push(responseItem);
                     }
                 }
+            }
+
+            if( searchSuggestions.length < numSuggestions ) {
+              for (var i = 0; i < user.length; i++) {
+                  // if the user email contains the search phase
+                  // index is to locate the position of the substring
+                  if( user[i].email.indexOf( req.body.searchPhase ) + req.body.searchPhase.length == user[i].email.length ) {
+                      if( searchSuggestions.length < numSuggestions) {
+                          if ( !checkEmailExistinArray(searchSuggestions, user[i].email) ) {
+                            var fullName = user[i].firstName + " " + user[i].lastName
+                            var responseItem = {
+                                            "email": user[i].email,
+                                            "name": fullName
+                                        }
+
+                            searchSuggestions.push(responseItem);
+                          }
+                      }
+                  }
+              }
+            }
+
+            if( searchSuggestions.length < numSuggestions ) {
+              for (var i = 0; i < user.length; i++) {
+                  // if the user email contains the search phase
+                  // index is to locate the position of the substring
+                  if( user[i].email.indexOf( req.body.searchPhase ) != -1 ) {
+                      if( searchSuggestions.length < numSuggestions) {
+                        if ( !checkEmailExistinArray(searchSuggestions, user[i].email) ) {
+                          var fullName = user[i].firstName + " " + user[i].lastName
+                          var responseItem = {
+                                          "email": user[i].email,
+                                          "name": fullName
+                                      }
+
+                          searchSuggestions.push(responseItem);
+                        }
+                      }
+                  }
+              }
             }
 
             // Continue to search the full name \
@@ -363,43 +415,48 @@ router.route('/addUserAsFriend/:email')
         async.eachSeries(req.body.userList, function(email, next){
             var conditions = {"email":email};
 
-            User.findOne(conditions, function(err, user){
-                if (err) {
-                    res.status(500).send(err);
-                }
+            if (email == req.params.email) {
+              allAdded = false;
+              next();
+            } else {
+              User.findOne(conditions, function(err, user){
+                  if (err) {
+                      res.status(500).send(err);
+                  }
 
-                if(user !== null) {
-                    // if the friend to add is not in the friend list
-                    if(user.friends.indexOf(req.params.email) == -1) {
-                        user.friends.push(req.params.email);
-                        user.save(function(err){
-                            if(err) {
-                                res.status(500).send(err);
-                            }
-                        })
+                  if(user !== null) {
+                      // if the friend to add is not in the friend list
+                      if(user.friends.indexOf(req.params.email) == -1) {
+                          user.friends.push(req.params.email);
+                          user.save(function(err){
+                              if(err) {
+                                  res.status(500).send(err);
+                              }
+                          })
 
-                        var conditions = {"email":req.params.email};
-                        User.findOne(conditions, function(err, user){
-                            user.friends.push(email);
-                            user.save(function(err){
-                                if(err) {
-                                    res.status(500).send(err);
-                                }
-                            })
-                            friendAdded++;
-                            next();
-                        })
-                    } else {
-                        // the friend is already in the list
-                        allAdded = false;
-                        next();
-                    }
-                } else {
-                    // the friend cannot be found
-                    allAdded = false;
-                    next();
-                }
-            });
+                          var conditions = {"email":req.params.email};
+                          User.findOne(conditions, function(err, user){
+                              user.friends.push(email);
+                              user.save(function(err){
+                                  if(err) {
+                                      res.status(500).send(err);
+                                  }
+                              })
+                              friendAdded++;
+                              next();
+                          })
+                      } else {
+                          // the friend is already in the list
+                          allAdded = false;
+                          next();
+                      }
+                  } else {
+                      // the friend cannot be found
+                      allAdded = false;
+                      next();
+                  }
+              });
+            }
         }, function(err) {
             if(allAdded) {
                 res.status(200).json({"message":"all users in the list are successfully added"});
