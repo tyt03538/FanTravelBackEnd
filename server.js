@@ -29,7 +29,7 @@ var port = process.env.PORT || 8080;        // set our port
 // REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
 app.use('/api', indexRouter);
-
+// pkgGen.generate();
 // The following is the periodic function
 // It is to check if there are any trips that
 // have all schedules collected from the travellers
@@ -39,9 +39,9 @@ setInterval(function () {
     console.log('all trips checked - server.js');
 }, 3000);
 
-setInterval(function () {
-    pkgGen.generate();
-}, 60000);
+// setInterval(function () {
+//     pkgGen.generate();
+// }, 60000);
 
 
 // more routes for our API will happen here

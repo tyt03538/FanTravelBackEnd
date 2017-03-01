@@ -113,10 +113,12 @@ var matchingEngine = {
 									//console.log(splitResult[0]);
 									//console.log(splitResult[1]);
 
+									tgtPkg.flights[0].arrivalDate = new Date();
 									tgtPkg.flights[0].arrivalDate.setFullYear(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
 									tgtPkg.flights[0].arrivalDate.setHours(tgtPkg.flights[0].departureDate.getHours() + outhourFlight);
 									tgtPkg.flights[0].arrivalDate.setMinutes(tgtPkg.flights[0].departureDate.getMinutes() + outminsFlight);
 
+									tgtPkg.flights[1].arrivalDate = new Date();
 									tgtPkg.flights[1].arrivalDate.setFullYear(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
 									tgtPkg.flights[1].arrivalDate.setHours(tgtPkg.flights[1].departureDate.getHours() + inhourFlight);
 									tgtPkg.flights[1].arrivalDate.setMinutes(tgtPkg.flights[1].departureDate.getMinutes() + inminsFlight);
@@ -131,10 +133,10 @@ var matchingEngine = {
 								} else {
 									console.log("package not found");
 								}
-								
+
 							})
 						};
-								
+
 
 						trip.save(function(err){
 							if (err) {
