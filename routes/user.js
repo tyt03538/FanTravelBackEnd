@@ -339,18 +339,20 @@ router.route('/searchUser')
               for (var i = 0; i < user.length; i++) {
                   // if the user email contains the search phase
                   // index is to locate the position of the substring
-                  if( user[i].email.indexOf( req.body.searchPhase ) + req.body.searchPhase.length == user[i].email.length ) {
-                      if( searchSuggestions.length < numSuggestions) {
-                          if ( !checkEmailExistinArray(searchSuggestions, user[i].email) ) {
-                            var fullName = user[i].firstName + " " + user[i].lastName
-                            var responseItem = {
-                                            "email": user[i].email,
-                                            "name": fullName
-                                        }
+                  if( user[i].email.indexOf( req.body.searchPhase ) != -1 ) {
+                    if( user[i].email.indexOf( req.body.searchPhase ) + req.body.searchPhase.length == user[i].email.length ) {
+                        if( searchSuggestions.length < numSuggestions) {
+                            if ( !checkEmailExistinArray(searchSuggestions, user[i].email) ) {
+                              var fullName = user[i].firstName + " " + user[i].lastName
+                              var responseItem = {
+                                              "email": user[i].email,
+                                              "name": fullName
+                                          }
 
-                            searchSuggestions.push(responseItem);
-                          }
-                      }
+                              searchSuggestions.push(responseItem);
+                            }
+                        }
+                    }
                   }
               }
             }
